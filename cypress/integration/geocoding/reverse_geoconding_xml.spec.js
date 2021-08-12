@@ -1,6 +1,7 @@
 describe("reverse geocoding api - XML", () => {
   const apiKey = "AIzaSyBNW9ny7Q9TS1iRLYWgrWo4CwAb3wmrEik";
   const latlng = "40.714224,-73.96145";
+  const latlng_zero_result = "53.477752,-2.266695";
 
   it("Verify response contain xml header when sending an address", () => {
     cy.request(`/xml?latlng=${latlng}&key=${apiKey}`)
@@ -69,7 +70,7 @@ describe("reverse geocoding api - XML", () => {
 
   it("Verify response should contain zero results when result type do not match address sent", () => {
     cy.request({
-      url: `/xml?latlng=53.477752,-2.266695&result_type=street_address&key=${apiKey}`,
+      url: `/xml?latlng=${latlng_zero_result}&result_type=street_address&key=${apiKey}`,
       failOnStatusCode: false,
     }).then((response) => {
       const xml = Cypress.$.parseXML(response.body);

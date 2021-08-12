@@ -1,4 +1,6 @@
 describe("geocoding api - JSON", () => {
+  //if variables get to complicated to handle on this file
+  //they can be moved to a fixture file
   const apiKey = "AIzaSyBNW9ny7Q9TS1iRLYWgrWo4CwAb3wmrEik";
   const address = "1600+Amphitheatre+Parkway,+Mountain+View,+CA";
   const component =

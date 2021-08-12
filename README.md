@@ -4,6 +4,7 @@ Setup
 
 - install latest version of node.js
 - run npm install
+- run npm install cypress --save-dev
 
 How to run the Tests
 
