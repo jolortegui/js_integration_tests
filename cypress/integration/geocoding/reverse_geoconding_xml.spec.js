@@ -2,6 +2,7 @@ describe("reverse geocoding api - XML", () => {
   const apiKey = "AIzaSyBNW9ny7Q9TS1iRLYWgrWo4CwAb3wmrEik";
   const latlng = "40.714224,-73.96145";
   const latlng_zero_result = "53.477752,-2.266695";
+  const place_id = "ChIJd8BlQ2BZwokRAFUEcm_qrcA";
 
   it("Verify response contain xml header when sending an address", () => {
     cy.request(`/xml?latlng=${latlng}&key=${apiKey}`)
@@ -12,6 +13,16 @@ describe("reverse geocoding api - XML", () => {
 
   it("Verify response should contain expected result set when sending lat and lgn values", () => {
     cy.request(`/xml?latlng=${latlng}&key=${apiKey}`).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("OK");
+      expect(Cypress.$(xml).find("formatted_address").text()).to.contains(
+        "277 Bedford Ave, Brooklyn, NY 11211, USA"
+      );
+    });
+  });
+
+  it("Verify response should contain expected result set when sending valid place id", () => {
+    cy.request(`/xml?place_id=${place_id}&key=${apiKey}`).then((response) => {
       const xml = Cypress.$.parseXML(response.body);
       expect(Cypress.$(xml).find("status").text()).to.equal("OK");
       expect(Cypress.$(xml).find("formatted_address").text()).to.contains(
@@ -114,6 +125,19 @@ describe("reverse geocoding api - XML", () => {
       expect(Cypress.$(xml).find("status").text()).to.equal("REQUEST_DENIED");
       expect(Cypress.$(xml).find("error_message").text()).to.equal(
         "You must use an API key to authenticate each request to Google Maps Platform APIs. For additional information, please refer to http://g.co/dev/maps-no-account"
+      );
+    });
+  });
+
+  it("Verify response should contain expected error message when sending invalid place id", () => {
+    cy.request({
+      url: `/xml?place_id=${place_id}12345&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("INVALID_REQUEST");
+      expect(Cypress.$(xml).find("error_message").text()).to.equal(
+        "Invalid request. Invalid 'place_id' parameter."
       );
     });
   });
