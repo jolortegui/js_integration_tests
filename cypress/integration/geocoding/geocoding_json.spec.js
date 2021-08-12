@@ -110,4 +110,25 @@ describe("geocoding api - JSON", () => {
       );
     });
   });
+
+  it("Verify proper error message is sent when no address or component is sent in the url", () => {
+    cy.request({ url: `/json?key=${apiKey}`, failOnStatusCode: false }).then(
+      (response) => {
+        expect(response.body).to.have.property("status", "INVALID_REQUEST");
+        //error message
+        expect(response.body.error_message).to.equal(
+          "Invalid request. Missing the 'address', 'components', 'latlng' or 'place_id' parameter."
+        );
+      }
+    );
+  });
+
+  it("Verify no results are returned when sending components that exclude each other in the url", () => {
+    cy.request(
+      `/json?components=administrative_area:TX|country:FR&key=${apiKey}`
+    ).then((response) => {
+      expect(response.body).to.have.property("status", "ZERO_RESULTS");
+      expect(response.body.results.length).to.equal(0);
+    });
+  });
 });

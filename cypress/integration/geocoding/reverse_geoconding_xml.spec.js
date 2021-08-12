@@ -66,4 +66,54 @@ describe("reverse geocoding api - XML", () => {
       );
     });
   });
+
+  it("Verify response should contain zero results when result type do not match address sent", () => {
+    cy.request({
+      url: `/xml?latlng=53.477752,-2.266695&result_type=street_address&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("ZERO_RESULTS");
+      expect(Cypress.$(xml).find("formatted_address").text()).to.equal("");
+    });
+  });
+
+  it("Verify response should contain expected error message when non-existent result type is sent as an optional parameters", () => {
+    cy.request({
+      url: `/xml?latlng=${latlng}&result_type=NotSupported&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("INVALID_REQUEST");
+      expect(Cypress.$(xml).find("error_message").text()).to.equal(
+        "Invalid request. Invalid 'result_type' parameter."
+      );
+    });
+  });
+
+  it("Verify response should contain expected error message when non-existent location type is sent as an optional parameters", () => {
+    cy.request({
+      url: `/xml?latlng=${latlng}&location_type=NotSupported&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("INVALID_REQUEST");
+      expect(Cypress.$(xml).find("error_message").text()).to.equal(
+        "Invalid request. Invalid 'location_type' parameter."
+      );
+    });
+  });
+
+  it("Verify response should contain expected error message when apiKey is not sent", () => {
+    cy.request({
+      url: `/xml?latlng=${latlng}&key=`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("REQUEST_DENIED");
+      expect(Cypress.$(xml).find("error_message").text()).to.equal(
+        "You must use an API key to authenticate each request to Google Maps Platform APIs. For additional information, please refer to http://g.co/dev/maps-no-account"
+      );
+    });
+  });
 });

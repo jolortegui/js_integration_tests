@@ -111,4 +111,29 @@ describe("geocoding api - XML", () => {
       );
     });
   });
+
+  it("Verify proper error message is sent when no address or component is sent in the url", () => {
+    cy.request({ url: `/xml?key=${apiKey}`, failOnStatusCode: false }).then(
+      (response) => {
+        const xml = Cypress.$.parseXML(response.body);
+        expect(Cypress.$(xml).find("status").text()).to.equal(
+          "INVALID_REQUEST"
+        );
+        //error message
+        expect(Cypress.$(xml).find("error_message").text()).to.equal(
+          "Invalid request. Missing the 'address', 'components', 'latlng' or 'place_id' parameter."
+        );
+      }
+    );
+  });
+
+  it("Verify no results are returned when sending components that exclude each other in the url", () => {
+    cy.request(
+      `/xml?components=administrative_area:TX|country:FR&key=${apiKey}`
+    ).then((response) => {
+      const xml = Cypress.$.parseXML(response.body);
+      expect(Cypress.$(xml).find("status").text()).to.equal("ZERO_RESULTS");
+      expect(Cypress.$(xml).find("formatted_address").text()).to.equal("");
+    });
+  });
 });

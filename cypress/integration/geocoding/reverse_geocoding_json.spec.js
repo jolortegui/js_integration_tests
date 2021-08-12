@@ -66,4 +66,50 @@ describe("reverse geocoding api - JSON", () => {
       );
     });
   });
+
+  it("Verify response should contain zero results when result type do not match address sent", () => {
+    cy.request({
+      url: `/json?latlng=53.477752,-2.266695&result_type=street_address&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.body).to.have.property("status", "ZERO_RESULTS");
+      expect(response.body.results.length).to.equal(0);
+    });
+  });
+
+  it("Verify response should contain expected error message when non-existent result type is sent as an optional parameters", () => {
+    cy.request({
+      url: `/json?latlng=${latlng}&result_type=NotSupported&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.body).to.have.property("status", "INVALID_REQUEST");
+      expect(response.body.error_message).to.equal(
+        "Invalid request. Invalid 'result_type' parameter."
+      );
+    });
+  });
+
+  it("Verify response should contain expected error message when non-existent location type is sent as an optional parameters", () => {
+    cy.request({
+      url: `/json?latlng=${latlng}&location_type=NotSupported&key=${apiKey}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.body).to.have.property("status", "INVALID_REQUEST");
+      expect(response.body.error_message).to.equal(
+        "Invalid request. Invalid 'location_type' parameter."
+      );
+    });
+  });
+
+  it("Verify response should contain expected error message when apiKey is not sent", () => {
+    cy.request({
+      url: `/json?latlng=${latlng}&key=`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.body).to.have.property("status", "REQUEST_DENIED");
+      expect(response.body.error_message).to.equal(
+        "You must use an API key to authenticate each request to Google Maps Platform APIs. For additional information, please refer to http://g.co/dev/maps-no-account"
+      );
+    });
+  });
 });
