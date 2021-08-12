@@ -14,6 +14,7 @@ describe("geocoding api - JSON", () => {
 
   it("Verify response should contain expected result set when sending valid address", () => {
     cy.request(`/json?address=${address}&key=${apiKey}`).then((response) => {
+      expect(response.status).to.equal(200);
       expect(response.body).to.have.property("status", "OK");
       expect(response.body.results[0]).to.have.property(
         "formatted_address",
@@ -25,6 +26,7 @@ describe("geocoding api - JSON", () => {
   it("Verify response should contain expected result set when sending valid component", () => {
     cy.request(`/json?components=${component}&key=${apiKey}`).then(
       (response) => {
+        expect(response.status).to.equal(200);
         expect(response.body).to.have.property("status", "OK");
         expect(response.body.results[0]).to.have.property(
           "formatted_address",
@@ -37,6 +39,7 @@ describe("geocoding api - JSON", () => {
   it("Verify response should contain expected result set when using bounds as an optional parameter", () => {
     cy.request(`/json?address=${address}&bounds=${bounds}&key=${apiKey}`).then(
       (response) => {
+        expect(response.status).to.equal(200);
         expect(response.body).to.have.property("status", "OK");
         expect(response.body.results[0]).to.have.property(
           "formatted_address",
@@ -50,6 +53,7 @@ describe("geocoding api - JSON", () => {
     //using french as language
     cy.request(`/json?address=${address}&language=fr&key=${apiKey}`).then(
       (response) => {
+        expect(response.status).to.equal(200);
         expect(response.body).to.have.property("status", "OK");
         expect(response.body.results[0]).to.have.property(
           "formatted_address",
@@ -61,6 +65,7 @@ describe("geocoding api - JSON", () => {
 
   it("Verify response when no language has been set", () => {
     cy.request(`/json?address=上海+中國&key=${apiKey}`).then((response) => {
+      expect(response.status).to.equal(200);
       expect(response.body).to.have.property("status", "OK");
       expect(response.body.results[0]).to.have.property(
         "formatted_address",
@@ -72,6 +77,7 @@ describe("geocoding api - JSON", () => {
   it("Verify response should contain expected result set when using region as an optional parameter", () => {
     cy.request(`/json?address=Toledo&region=es&key=${apiKey}`).then(
       (response) => {
+        expect(response.status).to.equal(200);
         expect(response.body).to.have.property("status", "OK");
         expect(response.body.results[0]).to.have.property(
           "formatted_address",
@@ -85,6 +91,7 @@ describe("geocoding api - JSON", () => {
     cy.request(
       `/json?address=cuzco&components=country:Peru&key=${apiKey}`
     ).then((response) => {
+      expect(response.status).to.equal(200);
       expect(response.body).to.have.property("status", "OK");
       expect(response.body.results[0]).to.have.property(
         "formatted_address",
@@ -95,6 +102,7 @@ describe("geocoding api - JSON", () => {
 
   it("Verify response should be empty when a non existent address is sent as a parameter", () => {
     cy.request(`/json?address=randomString&key=${apiKey}`).then((response) => {
+      expect(response.status).to.equal(200);
       expect(response.body).to.have.property("status", "ZERO_RESULTS");
       //results have no content
       expect(response.body.results.length).to.equal(0);
@@ -103,6 +111,7 @@ describe("geocoding api - JSON", () => {
 
   it("Verify proper error message is sent when no api key is sent in the url", () => {
     cy.request(`/json?address=${address}`).then((response) => {
+      expect(response.status).to.equal(200);
       expect(response.body).to.have.property("status", "REQUEST_DENIED");
       //error message
       expect(response.body.error_message).to.equal(
@@ -114,6 +123,7 @@ describe("geocoding api - JSON", () => {
   it("Verify proper error message is sent when no address or component is sent in the url", () => {
     cy.request({ url: `/json?key=${apiKey}`, failOnStatusCode: false }).then(
       (response) => {
+        expect(response.status).to.equal(400);
         expect(response.body).to.have.property("status", "INVALID_REQUEST");
         //error message
         expect(response.body.error_message).to.equal(
@@ -127,6 +137,7 @@ describe("geocoding api - JSON", () => {
     cy.request(
       `/json?components=administrative_area:TX|country:FR&key=${apiKey}`
     ).then((response) => {
+      expect(response.status).to.equal(200);
       expect(response.body).to.have.property("status", "ZERO_RESULTS");
       expect(response.body.results.length).to.equal(0);
     });
